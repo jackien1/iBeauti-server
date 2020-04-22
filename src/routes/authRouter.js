@@ -5,6 +5,7 @@ const passport = require("passport");
 const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
 const User = require("../models/user");
+const Profile = require("../models/profile");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { SECRET, TIME } = process.env;
@@ -90,6 +91,31 @@ router.post("/login", async (req, res) => {
     });
   }
 });
+
+router.post(
+  "/add",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const newProfile = new Profile({
+      userId: req.user.userName,
+      selection: req.body.selection,
+      date: Date.now()
+    });
+
+    await newProfile.save();
+
+    res.sendStatus(200);
+  }
+);
+
+router.get(
+  "/profiles",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    const profiles = await Profile.find({ userId: req.user.userName });
+    return res.status(200).json(profiles);
+  }
+);
 
 router.get(
   "/getUser",
