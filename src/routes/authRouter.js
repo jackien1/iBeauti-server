@@ -108,6 +108,15 @@ router.post(
   }
 );
 
+router.post(
+  "/delete",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    await Profile.deleteOne({ _id: req.body._id });
+    res.sendStatus(200);
+  }
+);
+
 router.get(
   "/profiles",
   passport.authenticate("jwt", { session: false }),
